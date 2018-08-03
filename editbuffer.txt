@@ -1,0 +1,44 @@
+# This line is a comment line
+# In TextCAD description language there are end-line comments only.
+
+# Default units of coordinates are mm.
+# They also could be inch, cm, m.
+# Units are the second parameter of SOC - "System of coordinates"
+
+# Desctiption of default SOC:
+ 
+soc default{righthanded,inch }; 
+
+
+
+# righthanded - it means that Z axis coinsides with the vector product of axis X and Y.
+
+# Every file of part description has the only default system of coordinates.
+# We can define also as many as it's needed of SOCs with names with respect to default SOC.
+# To set any other SOC we have to describe vector and angles or set them directly in the parameters
+
+# Description of points:
+
+dot pt1 { 0.01, 0., 0.2 }; # this point is some where in the XZ plane.
+
+#The equivalent description of the point is 
+# dot pt1 {0.01,,0.2};
+
+# ";" is obligatuare at the end of expression and this permits to write expression more than in one line.
+
+dot 
+	pt2 
+		{,,}; # here we desctibe the origin of default SOC.
+
+dot pt3 
+{
+	1.0,	# X
+	0.5,	# Y
+			# zero Z component
+};
+
+
+# To define a vector we can use either one point or two points.
+# In case of one point the second one has coordinates {0,0,0}. 
+
+vector a1 { pt1 };

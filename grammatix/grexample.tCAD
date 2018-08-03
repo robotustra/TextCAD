@@ -1,0 +1,207 @@
+# This line is a comment line
+# In TextCAD description language there are end-line comments only.
+
+# Default units of coordinates are mm.
+# They also could be inch, cm, m.
+# Units are the second parameter of SOC - "System of coordinates"
+
+# Desctiption of default SOC:
+
+soc default { righthanded, inch }; # righthanded - it means that Z axis coinsides with the vector product of axis X and Y.
+
+# Every file of part description has the only default system of coordinates.
+# We can define also as many as it's needed of SOCs with names with respect to default SOC.
+# To set any other SOC we have to describe vector and angles or set them directly in the parameters
+
+# Description of points:
+
+dot pt1 { 0.01, 0., 0.2 }; # this point is some where in the XZ plane.
+
+#The equivalent description of the point is 
+# dot pt1 {0.01,,0.2};
+
+# ";" is obligatuare at the end of expression and this permits to write expression more than in one line.
+
+dot 
+	pt2 
+		{,,}; # here we desctibe the origin of default SOC.
+
+dot pt3 
+{
+	1.0,	# X
+	0.5,	# Y
+			# zero Z component
+};
+
+
+# To define a vector we can use either one point or two points.
+# In case of one point the second one has coordinates {0,0,0}. 
+
+vector a1 { pt1 };
+
+# In this case the componets of vector are a2.X = pt3.X - pt1.X; a2.Y = pt3.Y - pt1.Y;  etc..
+
+vector a2 { pt3, pt1 };
+
+# Vectors could be created as a result of different operations: addition, subtraction, intersections, normales to the surfaces..
+#
+
+vector v1 { pt3 };
+
+vector v2 { dot{ 3, 2, 4}, dot{ 0.1, 0.3, 0.4 } }; # Type "dot" could be omited if it's evident from description
+
+vector v3 { add(v1, v2) };
+
+vector v4 { sub(v1, v2) };
+
+vector v5 { vmul(v1, v2) }; # vector product vmul(v1, v2) == - vmul(v2, v1);
+
+# Any type of objects could form arrays:
+
+dot array dar1 {pt2, pt1, pt3, dot forth{1, 0.3, 4}, dot{4,4,}, {8,,} };
+
+# Access to the array elements could be done like this. By name or by index if there is no name defined for point.
+# dar1[1].X = 1; dar1.pt1.Y = 0.5; dar1.forth.style = CROSS;
+
+# indexii of arrays start from 1. To access the length of array use dar1.size
+# array supports operations like:
+
+# join, insert, cut...
+# Arrays of points and of vectors could be used in some operation in generation of complex surfaces and bodies.
+
+#Line could be created by two points or two vectors. It always keep 2 points.
+
+line ln1 {pt1, pt3};
+
+line ln2 {v2, v3}; # In this case coordinates of point is taken as if the beggining of vector is placed in the origin of coordinates.
+
+# Contour desctiption could be made with the use of points, vectors, lines, arcs, segments, circles and ellipses.
+# Contour can be flat or 3D.
+
+contour ct1 {pt1, v1, ln2};
+
+# Contour is not an array and could keep different type of objects.
+
+# Example of closed contour:
+
+dot d1 {,,};
+dot d2 {1,,};
+dot d3 {1,1,};
+dot d4 {,1,};
+
+contour ct2 { d1, d2, d3, d4, CLOSE}; # Keyword CLOSE means that last point is connected with the first point.
+
+# This contour is not equivalent to the contour below also it can look the same:
+
+contour ct3 {d1, d2, d3, d4, d1}; # 5 elements, not closed contour
+
+# Every contour has the direction and normale. For ct3 direction is considered as a set of vectors ftom point d1 to point d2, 
+# then form d2 to d3, etc.. Normale of this contour is vector{,,1}.
+
+# To draw circle we have to point the center point and normale vector. The length of normale vector is equal to the radius
+# of the circle.
+
+circle circ1 { dot{,2,2}, vector {1,,} };
+
+# Circle also can be drawn on two vectors and a center point.
+
+circle circ2 {dot {3.5, 4, }, vector {1,,}, vector{,1,} }; # In this case the normale of circle is equal to vmul(vector {1,,}, vector{,1,})
+# and the radius of circle is equal to the length of normale.
+
+# Arc description:
+
+arc ar1 { point {4,4,}, vector{-1,,}, vector{,1,} }; # it's 270 degree arc
+
+arc ar1 { point {4,4,}, vector{,1,}, vector{-1,,} }; # it's 90 degree arc with opposite normale. Radius of arc is the length of normale.
+
+# Ellipse:
+
+ellipse ell { point {1,1,1}, vector {3,,}, vector{,1,} }; # Ellipse has two radii. The bigger radius is set along with bigger axis of ellipse,
+# the second vector may not coinside with the smaller radius, but the point of vector is on the ellipse.
+# normale for this ellipse is vmul(vector {3,,}, vector{,1,})
+
+# To make the same ellipse with opposite normale, just switch vectors in arguments list.
+
+ellipse ell_opposite { point {1,1,1}, vector{,1,}, vector {3,,} };
+
+# All objects could be moved, copied, rotated, mirrored, etc..
+
+moveto(ell, vector{1,3,0});
+
+#It means that ellipse ell did a parallel motion to the point{ ell.X + 1, ell.Y + 3, ell.Z }
+
+#If we want just to put ellipse to right point we have to write:
+
+moveto(ell, dot{1,3,0} );
+
+# we can also create a new copy of ellipse:
+
+ellipse ell_copy = copyto(ell, vector{1,3,0});
+
+# Or another copy
+
+ellipse ell_copy1 = copyto(ell, point{1,3,});
+
+# To rotate object the rotation point and a vector of rotation is given. The length of vector gives the value of rotation angle
+
+turn (ln1, dot{5,5,}, 5 * vector {,,1}); # It's equivalent to turn (ln1, point{5,5,}, vector {,,5});
+
+# Copy object and turn it.
+
+ln5 = turncopy (ln1, dot{5,5,}, 5 * vector {,,1}); 
+# Any kind of objects could be moved, copied and turned.
+
+
+# Operations that can be done with contours: 
+# join (counturs must intersect each other), 
+# combine (cat create multilinked contour), 
+# round (rounds corners of contur with some radius), 
+# flat (flat corners of contur with some value), 
+# cut (creates nested contours, holes),
+# surf ( fill the contour and creates the surface with sweeping streight lines),
+# smoothsurf (creates the surface but spline it is contours doesn't lay in one plane),
+# extrude (to create a surface along some vector, line or other countour)
+
+# To create a boby from contour two operation should be done
+# 1) make a surface with surf action,
+# 2) extrude surface.
+
+surface ss = surf (ct1);
+
+body bd0 = extrude (ss, vector{ , ,4});
+
+# Surfaces can 
+# intersect (and create new contours),
+# solid (create a body form surfices as boundaries)
+
+# Bodies can:
+# join,
+# intersect,
+# subtract
+# and all operations appliable to objects.
+
+# Any object could be saved to the file like:
+
+"objects.tCAD" = write (pt1, pl1); # Every object is written in the format it's described in this file.
+# to append objects use writenext
+
+# Objects can be loaded from files.
+
+dot pt9 = readnext ("obj.tCAD");
+
+# Some loops can be done to simplfy the code:
+
+
+integer it;
+
+do it=1,10;
+	
+	# some actions
+
+loop it;
+
+# Loops can be nested.
+
+# Objects can be hidden from displaying
+
+hide pt1, surf1;

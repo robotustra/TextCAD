@@ -1,0 +1,7 @@
+
+
+NameDefinition:
+
+TYPE NAME ["{" VALUE "}"] ";"
+
+
