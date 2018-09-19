@@ -188,7 +188,7 @@ void GLWidget::paintEvent(QPaintEvent *event)
         if (bubble->rect().intersects(event->rect()))
             bubble->drawBubble(&painter);
     }
-    drawInstructions(&painter);
+    //drawInstructions(&painter);
     painter.end();
 
 }
