@@ -27,4 +27,4 @@ HEADERS  += mainwindow.h \
 FORMS    += TextCAD.ui
 
 
-LIBS += -lopengl32 -lglu32
+#LIBS += -lopengl32 -lglu32
